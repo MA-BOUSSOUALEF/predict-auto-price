@@ -20,9 +20,6 @@ This project is an **interactive web application** designed to predict the price
 - **Azure API Management**: If applicable, used for exposing the machine learning model as an API.
 - **Machine Learning**: A pre-trained machine learning model on Azure that predicts car prices based on the input features.
 
-## Installation
-
-To run this project locally, follow these steps:
 
 1. **Clone the repository**:
 
