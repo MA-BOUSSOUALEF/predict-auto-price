@@ -1,4 +1,6 @@
 # Vehicle Price Prediction Application
+![image](https://github.com/user-attachments/assets/4f5f8168-64a4-42c3-9c9e-1ed829df7af3)
+![image](https://github.com/user-attachments/assets/58bc7a1f-9e59-42f3-9b98-f84ba8013866)
 
 ## Project Overview
 
