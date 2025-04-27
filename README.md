@@ -19,5 +19,5 @@ This project is an **interactive web application** designed to predict the price
 - **JavaScript**: For handling user input and sending the data to the Flask backend.
 - **HTML/CSS**: For creating and styling the user interface.
 - **Azure Machine Learning**: Deployed machine learning model on Azure for predicting car prices.
-- **Azure API Management**: If applicable, used for exposing the machine learning model as an API.
+- **Azure API Management**: Used for exposing the machine learning model as an API.
 - **Machine Learning**: A pre-trained machine learning model on Azure that predicts car prices based on the input features.
