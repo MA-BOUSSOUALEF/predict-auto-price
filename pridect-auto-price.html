@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prédire le prix de votre voiture</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            background-color: white;
+            border-radius: 0 0 10px 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            font-size: 1.3rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+            outline: none;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+            outline: none;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .result-container {
+            margin-top: 40px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: var(--light-color);
+            display: none;
+        }
+        
+        .result-container.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .result-header {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            text-align: center;
+        }
+        
+        .result-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .info-section {
+            margin-top: 40px;
+        }
+        
+        .info-section h2 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+        }
+        
+        .info-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .info-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-top: 4px solid var(--primary-color);
+        }
+        
+        .info-card h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+        
+        .info-card p {
+            color: #555;
+            margin-bottom: 15px;
+        }
+        
+        .info-card i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+
+        .tooltip i {
+            color: var(--primary-color);
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon .form-control {
+            padding-right: 40px;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Estimer le prix de votre voiture 🚗</h1>
+            <p>Notre algorithme de pointe peut prédire la valeur de marché de votre véhicule avec précision</p>
+        </header>
+        
+        <div class="main-content">
+            <form id="carForm">
+                <div class="form-container">
+                    <div class="form-section">
+                        <h3>Informations générales</h3>
+                        
+                        <div class="form-group">
+                            <label for="make">Marque
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Marque du véhicule (ex: Toyota, BMW, Audi)</span>
+                                </span>
+                            </label>
+                            <select class="form-select" id="make" required>
+                                <option value="" disabled selected>Sélectionnez une marque</option>
+                                <option value="audi">Audi</option>
+                                <option value="bmw">BMW</option>
+                                <option value="chevrolet">Chevrolet</option>
+                                <option value="dodge">Dodge</option>
+                                <option value="honda">Honda</option>
+                                <option value="jaguar">Jaguar</option>
+                                <option value="mazda">Mazda</option>
+                                <option value="mercedes-benz">Mercedes-Benz</option>
+                                <option value="mitsubishi">Mitsubishi</option>
+                                <option value="nissan">Nissan</option>
+                                <option value="porsche">Porsche</option>
+                                <option value="toyota">Toyota</option>
+                                <option value="volkswagen">Volkswagen</option>
+                                <option value="volvo">Volvo</option>
+                            </select>
+                            <div class="error-message" id="make-error">Veuillez sélectionner une marque</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="body_style">Type de carrosserie
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Style de carrosserie du véhicule</span>
+                                </span>
+                            </label>
+                            <select class="form-select" id="body_style" required>
+                                <option value="" disabled selected>Sélectionnez un type</option>
+                                <option value="convertible">Convertible</option>
+                                <option value="hatchback">Compacte (Hatchback)</option>
+                                <option value="sedan">Berline (Sedan)</option>
+                                <option value="wagon">Break (Wagon)</option>
+                                <option value="hardtop">Coupé (Hardtop)</option>
+                            </select>
+                            <div class="error-message" id="body_style-error">Veuillez sélectionner un type de carrosserie</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="num_of_doors">Nombre de portes
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Nombre de portes du véhicule</span>
+                                </span>
+                            </label>
+                            <select class="form-select" id="num_of_doors" required>
+                                <option value="" disabled selected>Sélectionnez une option</option>
+                                <option value="two">2 portes</option>
+                                <option value="four">4 portes</option>
+                            </select>
+                            <div class="error-message" id="num_of_doors-error">Veuillez sélectionner le nombre de portes</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="drive_wheels">Traction
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Type de transmission</span>
+                                </span>
+                            </label>
+                            <select class="form-select" id="drive_wheels" required>
+                                <option value="" disabled selected>Sélectionnez une option</option>
+                                <option value="fwd">Traction avant (FWD)</option>
+                                <option value="rwd">Propulsion arrière (RWD)</option>
+                                <option value="4wd">4 roues motrices (4WD)</option>
+                            </select>
+                            <div class="error-message" id="drive_wheels-error">Veuillez sélectionner un type de traction</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Caractéristiques moteur</h3>
+                        
+                        <div class="form-group">
+                            <label for="engine_type">Type de moteur
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Configuration du moteur (ex: dohc, ohc)</span>
+                                </span>
+                            </label>
+                            <select class="form-select" id="engine_type" required>
+                                <option value="" disabled selected>Sélectionnez une option</option>
+                                <option value="dohc">Double arbre à cames (DOHC)</option>
+                                <option value="ohcv">Arbre à cames en tête V (OHCV)</option>
+                                <option value="ohc">Arbre à cames en tête (OHC)</option>
+                                <option value="l">En ligne (L)</option>
+                                <option value="rotor">Rotatif (Wankel)</option>
+                            </select>
+                            <div class="error-message" id="engine_type-error">Veuillez sélectionner un type de moteur</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fuel_type">Type de carburant
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Type de carburant utilisé</span>
+                                </span>
+                            </label>
+                            <select class="form-select" id="fuel_type" required>
+                                <option value="" disabled selected>Sélectionnez une option</option>
+                                <option value="gas">Essence</option>
+                                <option value="diesel">Diesel</option>
+                            </select>
+                            <div class="error-message" id="fuel_type-error">Veuillez sélectionner un type de carburant</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="aspiration">Aspiration
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Méthode d'aspiration du moteur</span>
+                                </span>
+                            </label>
+                            <select class="form-select" id="aspiration" required>
+                                <option value="" disabled selected>Sélectionnez une option</option>
+                                <option value="std">Standard (atmosphérique)</option>
+                                <option value="turbo">Turbo</option>
+                            </select>
+                            <div class="error-message" id="aspiration-error">Veuillez sélectionner un type d'aspiration</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="num_of_cylinders">Nombre de cylindres
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Nombre de cylindres du moteur</span>
+                                </span>
+                            </label>
+                            <select class="form-select" id="num_of_cylinders" required>
+                                <option value="" disabled selected>Sélectionnez une option</option>
+                                <option value="two">2 cylindres</option>
+                                <option value="three">3 cylindres</option>
+                                <option value="four">4 cylindres</option>
+                                <option value="five">5 cylindres</option>
+                                <option value="six">6 cylindres</option>
+                                <option value="eight">8 cylindres</option>
+                                <option value="twelve">12 cylindres</option>
+                            </select>
+                            <div class="error-message" id="num_of_cylinders-error">Veuillez sélectionner le nombre de cylindres</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Spécifications techniques</h3>
+                        
+                        <div class="form-group">
+                            <label for="engine_size">Cylindrée (en cc)
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Taille du moteur en centimètres cubes</span>
+                                </span>
+                            </label>
+                            <div class="input-with-icon">
+                                <input type="number" class="form-control" id="engine_size" min="500" max="8000" required>
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="error-message" id="engine_size-error">Veuillez entrer une cylindrée valide (entre 500 et 8000 cc)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="horsepower">Puissance (en chevaux)
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Puissance du moteur en chevaux</span>
+                                </span>
+                            </label>
+                            <div class="input-with-icon">
+                                <input type="number" class="form-control" id="horsepower" min="40" max="1000" required>
+                                <i class="fas fa-horse"></i>
+                            </div>
+                            <div class="error-message" id="horsepower-error">Veuillez entrer une puissance valide (entre 40 et 1000 ch)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="curb_weight">Poids à vide (en kg)
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Poids du véhicule sans charge en kilogrammes</span>
+                                </span>
+                            </label>
+                            <div class="input-with-icon">
+                                <input type="number" class="form-control" id="curb_weight" min="500" max="5000" required>
+                                <i class="fas fa-weight-hanging"></i>
+                            </div>
+                            <div class="error-message" id="curb_weight-error">Veuillez entrer un poids valide (entre 500 et 5000 kg)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="submit" class="btn" id="submitBtn">
+                        <i class="fas fa-calculator"></i> Calculer le prix
+                    </button>
+                </div>
+            </form>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Calcul en cours...</p>
+            </div>
+            
+            <div class="result-container" id="resultContainer">
+                <div class="result-header">Estimation du prix</div>
+                <div class="result-price" id="resultPrice">0 €</div>
+                
+                <div class="card">
+                    <p>Cette estimation est basée sur notre modèle prédictif qui analyse les caractéristiques de votre véhicule pour déterminer sa valeur marchande. Veuillez noter que ce prix est donné à titre indicatif et peut varier en fonction d'autres facteurs tels que l'état général du véhicule, son historique et le marché local.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h2>Comment ça marche?</h2>
+            <div class="info-cards">
+                <div class="info-card">
+                    <i class="fas fa-database"></i>
+                    <h3>Technologie avancée</h3>
+                    <p>Notre système utilise un algorithme d'apprentissage automatique entraîné sur des milliers de transactions automobiles pour prédire le prix de votre véhicule avec précision.</p>
+                </div>
+                
+                <div class="info-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Données du marché</h3>
+                    <p>Nous analysons continuellement le marché automobile pour vous fournir une estimation qui reflète les tendances actuelles et la demande du marché.</p>
+                </div>
+                
+                <div class="info-card">
+                    <i class="fas fa-car"></i>
+                    <h3>Caractéristiques précises</h3>
+                    <p>Plus les informations que vous fournissez sont précises, plus notre estimation sera fiable. Nous prenons en compte de nombreux facteurs techniques pour affiner notre prédiction.</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 Estimateur de Prix Auto - Un service basé sur l'intelligence artificielle</p>
+        </footer>
+    </div>
+
+    <script>
+        // Validation des champs du formulaire
+        const form = document.getElementById("carForm");
+        const submitBtn = document.getElementById("submitBtn");
+        const resultContainer = document.getElementById("resultContainer");
+        const resultPrice = document.getElementById("resultPrice");
+        const loadingIndicator = document.getElementById("loading");
+        
+        // Liste des champs à valider
+        const fields = ["make", "fuel_type", "aspiration", "num_of_doors", "body_style", 
+                        "drive_wheels", "engine_type", "num_of_cylinders", "engine_size", 
+                        "horsepower", "curb_weight"];
+        
+        // Fonction pour afficher les messages d'erreur
+        function showError(fieldId, message) {
+            const errorElement = document.getElementById(`${fieldId}-error`);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = "block";
+                document.getElementById(fieldId).classList.add("error");
+            }
+        }
+        
+        // Fonction pour cacher les messages d'erreur
+        function hideError(fieldId) {
+            const errorElement = document.getElementById(`${fieldId}-error`);
+            if (errorElement) {
+                errorElement.style.display = "none";
+                document.getElementById(fieldId).classList.remove("error");
+            }
+        }
+        
+        // Ajout des écouteurs d'événements pour les champs
+        fields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            
+            field.addEventListener("input", function() {
+                hideError(fieldId);
+            });
+            
+            field.addEventListener("blur", function() {
+                validateField(fieldId);
+            });
+        });
+        
+        // Validation d'un champ spécifique
+        function validateField(fieldId) {
+            const field = document.getElementById(fieldId);
+            const value = field.value.trim();
+            
+            if (!value) {
+                showError(fieldId, `Ce champ est requis`);
+                return false;
+            }
+            
+            // Validations spécifiques selon le type de champ
+            switch(fieldId) {
+                case "engine_size":
+                    const engineSize = parseFloat(value);
+                    if (isNaN(engineSize) || engineSize < 500 || engineSize > 8000) {
+                        showError(fieldId, "La cylindrée doit être entre 500 et 8000 cc");
+                        return false;
+                    }
+                    break;
+                    
+                case "horsepower":
+                    const horsepower = parseFloat(value);
+                    if (isNaN(horsepower) || horsepower < 40 || horsepower > 1000) {
+                        showError(fieldId, "La puissance doit être entre 40 et 1000 ch");
+                        return false;
+                    }
+                    break;
+                    
+                case "curb_weight":
+                    const weight = parseFloat(value);
+                    if (isNaN(weight) || weight < 500 || weight > 5000) {
+                        showError(fieldId, "Le poids doit être entre 500 et 5000 kg");
+                        return false;
+                    }
+                    break;
+            }
+            
+            return true;
+        }
+        
+        // Validation complète du formulaire
+        function validateForm() {
+            let isValid = true;
+            
+            fields.forEach(fieldId => {
+                if (!validateField(fieldId)) {
+                    isValid = false;
+                }
+            });
+            
+            return isValid;
+        }
+        
+        // Traitement du formulaire
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            
+            // Validation du formulaire
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Affichage du chargement
+            loadingIndicator.style.display = "block";
+            resultContainer.classList.remove("show");
+            submitBtn.disabled = true;
+            
+            // Préparation des données
+            const data = {
+                "Inputs": {
+                    "WebServiceInput0": [
+                        {
+                            "symboling": 0,
+                            "make": document.getElementById("make").value,
+                            "fuel-type": document.getElementById("fuel_type").value,
+                            "aspiration": document.getElementById("aspiration").value,
+                            "num-of-doors": document.getElementById("num_of_doors").value,
+                            "body-style": document.getElementById("body_style").value,
+                            "drive-wheels": document.getElementById("drive_wheels").value,
+                            "engine-location": "front",
+                            "wheel-base": 88.6,
+                            "length": 168.8,
+                            "width": 64.1,
+                            "height": 48.8,
+                            "curb-weight": parseFloat(document.getElementById("curb_weight").value),
+                            "engine-type": document.getElementById("engine_type").value,
+                            "num-of-cylinders": document.getElementById("num_of_cylinders").value,
+                            "engine-size": parseFloat(document.getElementById("engine_size").value),
+                            "fuel-system": "mpfi",
+                            "bore": 3.47,
+                            "stroke": 2.68,
+                            "compression-ratio": 9.0,
+                            "horsepower": parseFloat(document.getElementById("horsepower").value),
+                            "peak-rpm": 5000,
+                            "city-mpg": 21,
+                            "highway-mpg": 27
+                        }
+                    ]
+                }
+            };
+
+            try {
+                // Simuler un délai pour montrer le chargement (à des fins de démonstration)
+                // Dans un environnement réel, cette partie serait supprimée
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Envoi de la requête au serveur
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Traitement de la réponse
+                if (result.error) {
+                    alert("Erreur: " + result.error);
+                } else {
+                    // Conversion en format monétaire
+                    const price = parseFloat(result.Results.WebServiceOutput0[0].predict_price);
+                    resultPrice.textContent = price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+                    resultContainer.classList.add("show");
+                }
+            } catch (error) {
+                console.error("Erreur lors de la requête:", error);
+                alert("Une erreur s'est produite lors de la récupération des données. Veuillez réessayer plus tard.");
+            } finally {
+                // Masquer le chargement et réactiver le bouton
+                loadingIndicator.style.display = "none";
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs5-toast@1.0.0/dist/bs5-toast.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs5-modal@1.0.0/dist/bs5-modal.min.js"></script>
